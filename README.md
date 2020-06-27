@@ -1,4 +1,4 @@
-[![GitHub Actions](https://github.com/Ray-Garraty/Perform+linter+check+and+module+tests/workflows/Perform+linter+check+and+module+tests/badge.svg)](https://github.com/Ray-Garraty/frontend-project-lvl2/actions)
+[![GitHub Actions](https://github.com/Ray-Garraty/frontend-project-lvl2/workflows/Run_linter_and_tests/badge.svg)](https://github.com/Ray-Garraty/frontend-project-lvl2/actions)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/879c931256464ef64186/maintainability)](https://codeclimate.com/github/Ray-Garraty/frontend-project-lvl2/maintainability)
 
