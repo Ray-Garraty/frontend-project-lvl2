@@ -1,0 +1,9 @@
+  cartIsEmpty: false
+  shopName: OKAY
+  apples: 15
+  tomatoes: 7
+  oranges: 10
+  meat: chicken, beef, pork
+  sunflowerOil: false
+  cola: false
+  alcohol: true

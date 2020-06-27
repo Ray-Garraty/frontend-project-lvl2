@@ -1,13 +1,8 @@
-import fs from 'fs';
-import path from 'path';
-import process from 'process';
+import parseFile from './src/parsers.js';
 
 const genDiff = (filepath1, filepath2) => {
-  const workingDir = process.cwd();
-  const filePath1Resolved = filepath1.startsWith('.') ? path.resolve(workingDir, filepath1) : path.resolve(filepath1);
-  const filePath2Resolved = filepath2.startsWith('.') ? path.resolve(workingDir, filepath2) : path.resolve(filepath2);
-  const objectBefore = JSON.parse(fs.readFileSync(filePath1Resolved));
-  const objectAfter = JSON.parse(fs.readFileSync(filePath2Resolved));
+  const objectBefore = parseFile(filepath1);
+  const objectAfter = parseFile(filepath2);
   const keysBefore = Object.keys(objectBefore);
   const keysAfter = Object.keys(objectAfter);
   const diff = {};

@@ -1,0 +1,10 @@
+  version: 2
+  working_directory: ~/mern-starter
+  image: circleci/node:4.8.2-jessie
+  command: 'sudo npm install -g npm@latest'
+  key: dependency-cache-{{ checksum "package-lock.json" }}
+  prefix: tests
+  run: bundle exec rake db:create db:schema:load
+  enabled: true
+  name: Install CocoaPods
+  jobs: build-and-test

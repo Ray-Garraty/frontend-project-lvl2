@@ -1,0 +1,10 @@
+  version: 3
+  image: circleci/node:4.8.2-jessie
+  steps: checkout, save_cache
+  prefix: tests
+  run: bundle --path vendor/bundle
+  command: 'sudo npm install -g npm@latest'
+  enabled: true
+  jobs: build-and-test
+  working_directory: ~/circleci-demo-workflows
+  key: v1-bundle-{{ checksum "Gemfile.lock" }}  

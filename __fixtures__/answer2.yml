@@ -1,0 +1,17 @@
+{
+    cartIsEmpty: false
+  + shopName: OKAY
+  - shopName: Auchan
+  - bananas: 10
+    apples: 15
+    tomatoes: 7
+  + sunflowerOil: false
+  - sunflowerOil: true
+  + cola: false
+  - cola: true
+  + alcohol: true
+  - alcohol: none
+  - spices: salt, pepper
+  + oranges: 10
+  + meat: chicken, beef, pork
+}
