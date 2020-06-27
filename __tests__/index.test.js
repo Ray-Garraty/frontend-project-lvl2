@@ -36,3 +36,12 @@ test('Processing second pair of files...', () => {
   answer = getAnswer(`answer${testNumber}.json`);
   expect(result).toBe(answer);
 });
+
+test('Processing third pair of files...', () => {
+  testNumber = 3;
+  pathToBeforeFile = getFixturePath(`before${testNumber}.json`);
+  pathToAfterFile = getFixturePath(`after${testNumber}.json`);
+  result = getResult(pathToBeforeFile, pathToAfterFile);
+  answer = getAnswer(`answer${testNumber}.json`);
+  expect(result).toBe(answer);
+});

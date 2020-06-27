@@ -1,9 +1,6 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
-const fs = require('fs');
-const path = require('path');
-const process = require('process');
+import fs from 'fs';
+import path from 'path';
+import process from 'process';
 
 const genDiff = (filepath1, filepath2) => {
   const workingDir = process.cwd();
