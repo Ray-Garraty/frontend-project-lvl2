@@ -8,7 +8,7 @@
     "gendiff": "src/bin/gendiff.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx -n --experimental-vm-modules jest"
   },
   "repository": {
     "type": "git",
@@ -26,11 +26,14 @@
   },
   "homepage": "https://github.com/Ray-Garraty/frontend-project-lvl2#readme",
   "dependencies": {
+    "@jest/globals": "^26.1.0",
     "commander": "^5.1.0"
   },
   "devDependencies": {
     "eslint": "^7.3.1",
     "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-plugin-import": "^2.21.2"
+    "eslint-plugin-import": "^2.21.2",
+    "jest": "^26.1.0",
+    "jest-cli": "^26.1.0"
   }
 }
