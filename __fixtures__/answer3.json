@@ -1,0 +1,19 @@
+{
+    Warming-up time: 10
+  + Workout time: 70
+  - Workout time: 60
+  + Push-ups count: 65
+  - Push-ups count: 45
+  + Barbell Squats Count: 45
+  - Barbell Squats Count: 33
+  + Exercising at: Gym
+  - Exercising at: Home
+  + Cardio: true
+  - Cardio: false
+  + Protein Coctail: true
+  - Protein Coctail: false
+  + Chin-ups count: 30
+  - Chin-ups count: 20
+  + Barbell Deadlift Count: 24
+  + BCAA: true
+}
