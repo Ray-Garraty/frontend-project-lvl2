@@ -63,3 +63,21 @@ test('Processing second pair of .yml files...', () => {
   answer = getAnswer(`answer${testNumber}.yml`);
   expect(result).toBe(answer);
 });
+
+test('Processing first pair of .ini files...', () => {
+  testNumber = 1;
+  pathToBeforeFile = getFixturePath(`before${testNumber}.ini`);
+  pathToAfterFile = getFixturePath(`after${testNumber}.ini`);
+  result = getResult(pathToBeforeFile, pathToAfterFile);
+  answer = getAnswer(`answer${testNumber}.ini`);
+  expect(result).toBe(answer);
+});
+
+test('Processing second pair of .ini files...', () => {
+  testNumber = 2;
+  pathToBeforeFile = getFixturePath(`before${testNumber}.ini`);
+  pathToAfterFile = getFixturePath(`after${testNumber}.ini`);
+  result = getResult(pathToBeforeFile, pathToAfterFile);
+  answer = getAnswer(`answer${testNumber}.ini`);
+  expect(result).toBe(answer);
+});
