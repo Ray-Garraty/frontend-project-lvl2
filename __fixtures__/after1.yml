@@ -7,4 +7,4 @@
   enabled: true
   jobs: build-and-test
   working_directory: ~/circleci-demo-workflows
-  key: v1-bundle-{{ checksum "Gemfile.lock" }}  
+  key: v1-bundle-{{ checksum 'Gemfile.lock' }}  

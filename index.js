@@ -1,37 +1,45 @@
 import parseFile from './src/parsers.js';
+import stringifyObject from './src/stylish.js';
 
-const genDiff = (filepath1, filepath2) => {
-  const objectBefore = parseFile(filepath1);
-  const objectAfter = parseFile(filepath2);
-  const keysBefore = Object.keys(objectBefore);
-  const keysAfter = Object.keys(objectAfter);
-  const diff = {};
-  keysBefore.forEach((key) => {
-    if (keysAfter.includes(key)) {
-      if (objectBefore[key] === objectAfter[key]) {
-        diff[`    ${key}`] = objectBefore[key];
+const createObjectFromFile = (filepath) => parseFile(filepath);
+
+const genDiff = (filepath1, filepath2, format) => {
+  const objectBefore = createObjectFromFile(filepath1);
+  const objectAfter = createObjectFromFile(filepath2);
+
+  const genDiffBetweenObjects = (object1, object2) => {
+    const keys1 = Object.keys(object1);
+    const keys2 = Object.keys(object2);
+    const result = {};
+    keys1.forEach((key) => {
+      const value1 = object1[key];
+      const value2 = object2[key];
+      if (keys2.includes(key)) {
+        if (value1 === value2) {
+          result[`  ${key}`] = value1;
+        } else if (value1.constructor.name === 'Object' && value2.constructor.name === 'Object') {
+          result[`  ${key}`] = genDiffBetweenObjects(value1, value2);
+        } else {
+          result[`+ ${key}`] = value2;
+          result[`- ${key}`] = value1;
+        }
       } else {
-        const beforeKey = `  - ${key}`;
-        const afterKey = `  + ${key}`;
-        diff[afterKey] = objectAfter[key];
-        diff[beforeKey] = objectBefore[key];
+        result[`- ${key}`] = value1;
       }
-    } else {
-      const deletedKey = `  - ${key}`;
-      diff[deletedKey] = objectBefore[key];
-    }
-  });
-  keysAfter.forEach((key) => {
-    if (!keysBefore.includes(key)) {
-      const newKey = `  + ${key}`;
-      diff[newKey] = objectAfter[key];
-    }
-  });
-  const entries = Object.entries(diff);
-  const newArray = [];
-  entries.forEach((element) => newArray.push(element.join(': ')));
-  const result = `{\n${newArray.join('\n')}\n}`;
-  return result;
+    });
+    keys2.forEach((key) => {
+      if (!keys1.includes(key)) {
+        result[`+ ${key}`] = object2[key];
+      }
+    });
+    return result;
+  };
+
+  const result = genDiffBetweenObjects(objectBefore, objectAfter);
+  if (format === 'stylish') {
+    return stringifyObject(result);
+  }
+  return '';
 };
 
 export default genDiff;

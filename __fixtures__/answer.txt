@@ -1,0 +1,31 @@
+{
+  fruits: {
+    bananas: 5
+    oranges: 6
+    apples: 10
+    grapes: {
+      seedy: 10
+      seedless: 5
+    }
+  }
+  vegetables: {
+    potatoes: 7
+    mushrooms: {
+      white: 10
+      grey: 12
+    }
+    tomatoes: none
+  }
+  meat: {
+    chicken: plenty
+    beef: not a lot
+    pork: almost none
+  }
+  bread: {
+    brown: 2
+    white: none
+  }
+  candies: none
+  beverages: cola
+  spoiled: false
+}
