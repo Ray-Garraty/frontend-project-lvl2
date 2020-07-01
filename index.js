@@ -1,7 +1,15 @@
+/* eslint-disable no-underscore-dangle */
+import path from 'path';
+import process from 'process';
 import parseFile from './src/parsers.js';
 import chooseFormatter from './src/formatters/index.js';
 
-const createObjectFromFile = (filepath) => parseFile(filepath);
+const parseFilePath = (somepath) => (somepath.startsWith('/') ? somepath : path.join(process.cwd(), somepath));
+
+const createObjectFromFile = (name) => {
+  const fullFilePath = parseFilePath(name);
+  return parseFile(fullFilePath);
+};
 
 const genDiff = (filepath1, filepath2, format) => {
   const objectBefore = createObjectFromFile(filepath1);

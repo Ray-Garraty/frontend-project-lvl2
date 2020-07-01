@@ -1,25 +1,13 @@
-/* eslint-disable no-underscore-dangle */
-
-import { test, expect, beforeEach } from '@jest/globals';
-import path, { format } from 'path';
-import { dirname } from 'path';
+import { test, expect } from '@jest/globals';
+import path from 'path';
+import process from 'process';
 import fs from 'fs';
 import genDiff from '../index';
-import { fileURLToPath } from 'url';
 import stringifyObject from '../src/formatters/stylish';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-let result;
-let answer;
-let fileExt;
-let testNumber;
-let outputFormat;
-
-const genFileName = (fileType, testNumber, fileExt) => `${fileType}${testNumber}.${fileExt}`;
-const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
-const readFile = (filename) => fs.readFileSync(getFixturePath(filename), "utf8");
+const getFixturePath = (fileName) => path.join(process.cwd(), '__fixtures__', fileName);
+const genFileName = (fileType, testNum, fileExtension) => `${fileType}${testNum}.${fileExtension}`;
+const readFile = (filename) => fs.readFileSync(getFixturePath(filename), 'utf8');
 
 const getAnswerFromFile = (testNumber, fileExt) => {
   const filename = genFileName('answer', testNumber, fileExt);
@@ -33,6 +21,12 @@ const getResult = (testNumber, fileExt, outputFormat) => {
   const pathToAfterFile = getFixturePath(afterFileName);
   return genDiff(pathToBeforeFile, pathToAfterFile, outputFormat);
 };
+
+let result;
+let answer;
+let fileExt;
+let testNumber;
+let outputFormat;
 
 test('Processing first pair of .json files...', () => {
   testNumber = 1;
@@ -79,6 +73,15 @@ test('Processing fifth pair of .json files...', () => {
   expect(result).toBe(answer);
 });
 
+test('Processing sixth pair of .json files...', () => {
+  testNumber = 6;
+  fileExt = 'json';
+  outputFormat = 'json';
+  result = getResult(testNumber, fileExt, outputFormat);
+  answer = getAnswerFromFile(testNumber, fileExt);
+  expect(result).toBe(answer);
+});
+
 test('Processing first pair of .yml files...', () => {
   testNumber = 1;
   fileExt = 'yml';
@@ -116,8 +119,37 @@ test('Processing second pair of .ini files...', () => {
 });
 
 test('Checking function stringifyObject...', () => {
-  const obj = {'fruits': {bananas: 5, oranges: 6, apples: 10, 'grapes': {'seedy': 10, 'seedless': 5}}, 'vegetables': {'potatoes': 7, 'mushrooms': {'white': 10, 'grey': 12}, 'tomatoes': 'none'}, 'meat': {'chicken': 'plenty', 'beef': 'not a lot', 'pork': 'almost none'}, 'bread': {'brown': 2, 'white': 'none'}, 'candies': 'none', 'beverages': 'cola', 'spoiled': false};
-  const result = stringifyObject(obj);
-  const answer = readFile('answer.txt').trim();
+  const obj = {
+    fruits: {
+      bananas: 5,
+      oranges: 6,
+      apples: 10,
+      grapes: {
+        seedy: 10,
+        seedless: 5,
+      },
+    },
+    vegetables: {
+      potatoes: 7,
+      mushrooms: {
+        white: 10, grey: 12,
+      },
+      tomatoes: 'none',
+    },
+    meat: {
+      chicken: 'plenty',
+      beef: 'not a lot',
+      pork: 'almost none',
+    },
+    bread: {
+      brown: 2,
+      white: 'none',
+    },
+    candies: 'none',
+    beverages: 'cola',
+    spoiled: false,
+  };
+  result = stringifyObject(obj);
+  answer = readFile('answer.txt').trim();
   expect(result).toBe(answer);
 });
