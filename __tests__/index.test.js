@@ -6,16 +6,16 @@ import { dirname } from 'path';
 import fs from 'fs';
 import genDiff from '../index';
 import { fileURLToPath } from 'url';
-import stringifyObject from '../src/stylish';
+import stringifyObject from '../src/formatters/stylish';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const outputFormat = 'stylish';
 let result;
 let answer;
 let fileExt;
 let testNumber;
+let outputFormat;
 
 const genFileName = (fileType, testNumber, fileExt) => `${fileType}${testNumber}.${fileExt}`;
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
@@ -26,7 +26,7 @@ const getAnswerFromFile = (testNumber, fileExt) => {
   return readFile(filename).trim();
 };
 
-const getResult = (testNumber, fileExt) => {
+const getResult = (testNumber, fileExt, outputFormat) => {
   const beforeFileName = genFileName('before', testNumber, fileExt);
   const afterFileName = genFileName('after', testNumber, fileExt);
   const pathToBeforeFile = getFixturePath(beforeFileName);
@@ -37,7 +37,8 @@ const getResult = (testNumber, fileExt) => {
 test('Processing first pair of .json files...', () => {
   testNumber = 1;
   fileExt = 'json';
-  result = getResult(testNumber, fileExt);
+  outputFormat = 'stylish';
+  result = getResult(testNumber, fileExt, outputFormat);
   answer = getAnswerFromFile(testNumber, fileExt);
   expect(result).toBe(answer);
 });
@@ -45,7 +46,8 @@ test('Processing first pair of .json files...', () => {
 test('Processing second pair of .json files...', () => {
   testNumber = 2;
   fileExt = 'json';
-  result = getResult(testNumber, fileExt);
+  outputFormat = 'stylish';
+  result = getResult(testNumber, fileExt, outputFormat);
   answer = getAnswerFromFile(testNumber, fileExt);
   expect(result).toBe(answer);
 });
@@ -53,7 +55,8 @@ test('Processing second pair of .json files...', () => {
 test('Processing third pair of .json files...', () => {
   testNumber = 3;
   fileExt = 'json';
-  result = getResult(testNumber, fileExt);
+  outputFormat = 'stylish';
+  result = getResult(testNumber, fileExt, outputFormat);
   answer = getAnswerFromFile(testNumber, fileExt);
   expect(result).toBe(answer);
 });
@@ -61,7 +64,17 @@ test('Processing third pair of .json files...', () => {
 test('Processing fourth pair of .json files...', () => {
   testNumber = 4;
   fileExt = 'json';
-  result = getResult(testNumber, fileExt);
+  outputFormat = 'stylish';
+  result = getResult(testNumber, fileExt, outputFormat);
+  answer = getAnswerFromFile(testNumber, fileExt);
+  expect(result).toBe(answer);
+});
+
+test('Processing fifth pair of .json files...', () => {
+  testNumber = 5;
+  fileExt = 'json';
+  outputFormat = 'plain';
+  result = getResult(testNumber, fileExt, outputFormat);
   answer = getAnswerFromFile(testNumber, fileExt);
   expect(result).toBe(answer);
 });
@@ -69,7 +82,8 @@ test('Processing fourth pair of .json files...', () => {
 test('Processing first pair of .yml files...', () => {
   testNumber = 1;
   fileExt = 'yml';
-  result = getResult(testNumber, fileExt);
+  outputFormat = 'stylish';
+  result = getResult(testNumber, fileExt, outputFormat);
   answer = getAnswerFromFile(testNumber, fileExt);
   expect(result).toBe(answer);
 });
@@ -77,7 +91,8 @@ test('Processing first pair of .yml files...', () => {
 test('Processing second pair of .yml files...', () => {
   testNumber = 2;
   fileExt = 'yml';
-  result = getResult(testNumber, fileExt);
+  outputFormat = 'stylish';
+  result = getResult(testNumber, fileExt, outputFormat);
   answer = getAnswerFromFile(testNumber, fileExt);
   expect(result).toBe(answer);
 });
@@ -85,7 +100,8 @@ test('Processing second pair of .yml files...', () => {
 test('Processing first pair of .ini files...', () => {
   testNumber = 1;
   fileExt = 'ini';
-  result = getResult(testNumber, fileExt);
+  outputFormat = 'stylish';
+  result = getResult(testNumber, fileExt, outputFormat);
   answer = getAnswerFromFile(testNumber, fileExt);
   expect(result).toBe(answer);
 });
@@ -93,7 +109,8 @@ test('Processing first pair of .ini files...', () => {
 test('Processing second pair of .ini files...', () => {
   testNumber = 2;
   fileExt = 'ini';
-  result = getResult(testNumber, fileExt);
+  outputFormat = 'stylish';
+  result = getResult(testNumber, fileExt, outputFormat);
   answer = getAnswerFromFile(testNumber, fileExt);
   expect(result).toBe(answer);
 });

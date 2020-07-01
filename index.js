@@ -1,5 +1,5 @@
 import parseFile from './src/parsers.js';
-import stringifyObject from './src/stylish.js';
+import chooseFormatter from './src/formatters/index.js';
 
 const createObjectFromFile = (filepath) => parseFile(filepath);
 
@@ -24,22 +24,18 @@ const genDiff = (filepath1, filepath2, format) => {
           result[`- ${key}`] = value1;
         }
       } else {
-        result[`- ${key}`] = value1;
+        result[`--${key}`] = value1;
       }
     });
     keys2.forEach((key) => {
       if (!keys1.includes(key)) {
-        result[`+ ${key}`] = object2[key];
+        result[`++${key}`] = object2[key];
       }
     });
     return result;
   };
-
   const result = genDiffBetweenObjects(objectBefore, objectAfter);
-  if (format === 'stylish') {
-    return stringifyObject(result);
-  }
-  return '';
+  return chooseFormatter(format)(result);
 };
 
 export default genDiff;

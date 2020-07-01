@@ -8,7 +8,7 @@
   + key: v1-bundle-{{ checksum 'Gemfile.lock' }}
   - key: dependency-cache-{{ checksum 'package-lock.json' }}
     prefix: tests
-  + run: bundle --path vendor/bundle
+  + run: bundle -path vendor/bundle
   - run: bundle exec rake db:create db:schema:load
     enabled: true
   - name: Install CocoaPods

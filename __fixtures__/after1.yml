@@ -2,7 +2,7 @@
   image: circleci/node:4.8.2-jessie
   steps: checkout, save_cache
   prefix: tests
-  run: bundle --path vendor/bundle
+  run: bundle -path vendor/bundle
   command: 'sudo npm install -g npm@latest'
   enabled: true
   jobs: build-and-test

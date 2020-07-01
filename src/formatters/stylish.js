@@ -1,4 +1,9 @@
-export default (obj) => JSON.stringify(obj, null, 2).replace(/,\n/gi, '\n').replace(/"/gi, '').trim();
+export default (obj) => JSON.stringify(obj, null, 2)
+  .replace(/,\n/gi, '\n')
+  .replace(/"/gi, '')
+  .replace(/\+\+/gi, '+ ')
+  .replace(/--/gi, '- ')
+  .trim();
 
 /* const getStringFromObject = (obj) => {
   const entries = Object.entries(obj);
