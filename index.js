@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import path from 'path';
 import process from 'process';
 import parseFile from './src/parsers.js';
@@ -12,37 +11,54 @@ const createObjectFromFile = (name) => {
 };
 
 const genDiff = (filepath1, filepath2, format) => {
-  const objectBefore = createObjectFromFile(filepath1);
-  const objectAfter = createObjectFromFile(filepath2);
+  const obj1 = createObjectFromFile(filepath1);
+  const obj2 = createObjectFromFile(filepath2);
 
-  const genDiffBetweenObjects = (object1, object2) => {
+  const compareTwoObjects = (object1, object2) => {
     const keys1 = Object.keys(object1);
     const keys2 = Object.keys(object2);
-    const result = {};
-    keys1.forEach((key) => {
+    const result1 = keys1.map((key) => {
+      const name = key;
       const value1 = object1[key];
       const value2 = object2[key];
-      if (keys2.includes(key)) {
-        if (value1 === value2) {
-          result[`  ${key}`] = value1;
-        } else if (value1.constructor.name === 'Object' && value2.constructor.name === 'Object') {
-          result[`  ${key}`] = genDiffBetweenObjects(value1, value2);
-        } else {
-          result[`+ ${key}`] = value2;
-          result[`- ${key}`] = value1;
-        }
-      } else {
-        result[`--${key}`] = value1;
+      if (!keys2.includes(key)) {
+        // вносим запись, что этот ключ был удалён
+        const type = 'removed';
+        const value = value1;
+        return { name, type, value };
       }
-    });
-    keys2.forEach((key) => {
-      if (!keys1.includes(key)) {
-        result[`++${key}`] = object2[key];
+      if (object1[key].constructor.name === 'Object' && object2[key].constructor.name === 'Object') {
+        // берём их детей и запускаем с ними функцию compareTwoObjects
+        const children = compareTwoObjects(object1[key], object2[key]);
+        const type = 'has children';
+        return { name, type, children };
       }
+      if (value1 === value2) {
+        // вносим запись, что этот ключ присутствует в обоих файлах и имеет одинаковое значение
+        const type = 'same in both files';
+        const value = value1;
+        return { name, type, value };
+      }
+      // вносим запись, что этот ключ присутствует в обоих файлах и имеет 2 разных значения (какие)
+      const type = 'differs';
+      return {
+        name,
+        type,
+        value1,
+        value2,
+      };
     });
-    return result;
+    const result2 = keys2
+      .filter((key) => !keys1.includes(key))
+      .map((key) => {
+        const name = key;
+        const type = 'added';
+        const value = object2[key];
+        return { name, type, value };
+      });
+    return [...result1, ...result2];
   };
-  const result = genDiffBetweenObjects(objectBefore, objectAfter);
+  const result = compareTwoObjects(obj1, obj2);
   return chooseFormatter(format)(result);
 };
 

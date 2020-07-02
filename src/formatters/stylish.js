@@ -1,19 +1,31 @@
-export default (obj) => JSON.stringify(obj, null, 2)
-  .replace(/,\n/gi, '\n')
-  .replace(/"/gi, '')
-  .replace(/\+\+/gi, '+ ')
-  .replace(/--/gi, '- ')
-  .trim();
-
-/* const getStringFromObject = (obj) => {
-  const entries = Object.entries(obj);
-  const reducer = (acc, entry) => {
-    const [key, value] = entry;
+export default (tree) => {
+  const createIndentation = (n) => '  '.repeat(n);
+  const parseValue = (value, n) => {
     if (value.constructor.name !== 'Object') {
-      return `${acc}\n    ${key}:  ${value}`;
+      return value;
     }
-    return `${acc}\n  ${key}:  ${getStringFromObject(value)}`;
+    const [[key, val]] = Object.entries(value);
+    return `{\n${createIndentation(n + 1)}${key}: ${val}\n${createIndentation(n)}}`;
   };
-  const result = entries.reduce(reducer, '');
-  return result;
-}; */
+  const parseEntry = (entry, n) => {
+    if (entry.type === 'added') {
+      return `${createIndentation(n)}+ ${entry.name}: ${parseValue(entry.value, n)}`;
+    }
+    if (entry.type === 'removed') {
+      return `${createIndentation(n)}- ${entry.name}: ${parseValue(entry.value, n)}`;
+    }
+    if (entry.type === 'same in both files') {
+      return `${createIndentation(n)}  ${entry.name}: ${parseValue(entry.value, n)}`;
+    }
+    if (entry.type === 'differs') {
+      return `${createIndentation(n)}+ ${entry.name}: ${parseValue(entry.value2, n)}\n${createIndentation(n)}- ${entry.name}: ${parseValue(entry.value1, n)}`;
+    }
+    const keys = Object.keys(entry);
+    if (keys.includes('children')) {
+      const { children } = entry;
+      return `${createIndentation(n + 1)}${entry.name}: {\n${children.flatMap((child) => parseEntry(child, n + 1)).join('\n')}\n${createIndentation(n)}}`;
+    }
+    return "Oops, seems like something's wrong";
+  };
+  return `{\n${tree.flatMap((node) => parseEntry(node, 1)).join('\n')}\n}`;
+};
