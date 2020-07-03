@@ -1,8 +1,9 @@
 // export default (tree) => JSON.stringify(tree, null, 0);
+import _ from 'lodash';
 
 export default (tree) => {
   const parseValue = (value) => {
-    if (value.constructor.name !== 'Object') {
+    if (!_.isPlainObject(value)) {
       return value;
     }
     const [[key, val]] = Object.entries(value);

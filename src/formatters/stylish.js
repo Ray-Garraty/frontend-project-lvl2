@@ -1,7 +1,9 @@
+import _ from 'lodash';
+
 export default (tree) => {
   const createIndentation = (n) => '  '.repeat(n);
   const parseValue = (value, n) => {
-    if (value.constructor.name !== 'Object') {
+    if (!_.isPlainObject(value)) {
       return value;
     }
     const [[key, val]] = Object.entries(value);

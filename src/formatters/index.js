@@ -1,15 +1,14 @@
 import makePlainOutput from './plain.js';
-import stylish from './stylish.js';
-import json from './json.js';
+import makeJsonLikeOutput from './json.js';
+import makeStylishOutput from './stylish.js';
 
-const chooseFormatter = (format) => {
+export default (format) => {
   switch (format) {
     case 'plain':
       return makePlainOutput;
     case 'json':
-      return json;
+      return makeJsonLikeOutput;
     default:
-      return stylish;
+      return makeStylishOutput;
   }
 };
-export default chooseFormatter;

@@ -1,9 +1,11 @@
+import _ from 'lodash';
+
 export default (tree) => {
   const parseValue = (value) => {
-    if (value.constructor.name === 'Object') {
+    if (_.isPlainObject(value)) {
       return '[complex value]';
     }
-    if (typeof value === 'string') {
+    if (_.isString(value)) {
       return `'${value}'`;
     }
     return value;

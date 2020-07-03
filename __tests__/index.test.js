@@ -5,36 +5,28 @@ import {
   beforeEach,
 } from '@jest/globals';
 import path from 'path';
-import process from 'process';
-import fs from 'fs';
 import genDiff from '../index';
-
-const getFixturePath = (fileName) => path.join(process.cwd(), '__fixtures__', fileName);
-const readFile = (filename) => fs.readFileSync(getFixturePath(filename), 'utf8');
-
-const getContentFromExpectedFile = (outputFormat) => {
-  const filename = `expected.${outputFormat}`;
-  return readFile(filename).trim();
-};
+import getFileContents from '../src/parsers.js';
 
 const getResult = (fileExt, outputFormat) => {
-  const firstFileName = `1.${fileExt}`;
-  const secondFileName = `2.${fileExt}`;
-  const pathToFirstFile = getFixturePath(firstFileName);
-  const pathToSecondFile = getFixturePath(secondFileName);
+  const getFixturePath = (number) => path.join(process.cwd(), '__fixtures__', `${number}.${fileExt}`);
+  const pathToFirstFile = getFixturePath(1, fileExt);
+  const pathToSecondFile = getFixturePath(2, fileExt);
   return genDiff(pathToFirstFile, pathToSecondFile, outputFormat);
 };
 
 let format;
 let expected;
 let formatsStack;
+let expectedFilePath;
 
 beforeAll(() => {
   formatsStack = ['json', 'plain', 'stylish'];
 });
 beforeEach(() => {
   format = formatsStack.pop();
-  expected = getContentFromExpectedFile(format);
+  expectedFilePath = path.join(process.cwd(), '__fixtures__', `expected_${format}`);
+  expected = getFileContents(expectedFilePath);
 });
 test('Comparing 3 types of files in stylish output format...', () => {
   expect(getResult('json', format)).toBe(expected);

@@ -1,18 +1,12 @@
-import path from 'path';
-import process from 'process';
-import parseFile from './src/parsers.js';
+/* eslint-disable no-underscore-dangle */
+
+import _ from 'lodash';
+import getFileContents from './src/parsers.js';
 import chooseFormatter from './src/formatters/index.js';
 
-const parseFilePath = (somepath) => (somepath.startsWith('/') ? somepath : path.join(process.cwd(), somepath));
-
-const createObjectFromFile = (name) => {
-  const fullFilePath = parseFilePath(name);
-  return parseFile(fullFilePath);
-};
-
 const genDiff = (filepath1, filepath2, format) => {
-  const obj1 = createObjectFromFile(filepath1);
-  const obj2 = createObjectFromFile(filepath2);
+  const obj1 = getFileContents(filepath1);
+  const obj2 = getFileContents(filepath2);
 
   const compareTwoObjects = (object1, object2) => {
     const keys1 = Object.keys(object1);
@@ -27,9 +21,9 @@ const genDiff = (filepath1, filepath2, format) => {
         const value = value1;
         return { name, type, value };
       }
-      if (object1[key].constructor.name === 'Object' && object2[key].constructor.name === 'Object') {
+      if (_.isPlainObject(value1) && _.isPlainObject(value2)) {
         // берём их детей и запускаем с ними функцию compareTwoObjects
-        const children = compareTwoObjects(object1[key], object2[key]);
+        const children = compareTwoObjects(value1, value2);
         const type = 'has children';
         return { name, type, children };
       }
