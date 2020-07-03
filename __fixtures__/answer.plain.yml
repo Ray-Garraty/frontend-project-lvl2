@@ -1,6 +1,0 @@
-Property 'version' was updated. From 2 to 3
-Property 'working_directory' was updated. From '~/mern-starter' to '~/circleci-demo-workflows'
-Property 'key' was updated. From 'dependency-cache-{{ checksum 'package-lock.json' }}' to 'v1-bundle-{{ checksum 'Gemfile.lock' }}'
-Property 'run' was updated. From 'bundle exec rake db:create db:schema:load' to 'bundle -path vendor/bundle'
-Property 'name' was removed
-Property 'steps' was added with value: 'checkout, save_cache'

@@ -1,3 +1,5 @@
+// export default (tree) => JSON.stringify(tree, null, 0);
+
 export default (tree) => {
   const parseValue = (value) => {
     if (value.constructor.name !== 'Object') {
@@ -22,9 +24,9 @@ export default (tree) => {
     const keys = Object.keys(entry);
     if (keys.includes('children')) {
       const { children } = entry;
-      return `${entry.name}: {${children.flatMap((child) => parseEntry(child)).join(',')}}`;
+      return `${entry.name}: [${children.flatMap((child) => parseEntry(child)).join(',')}]`;
     }
     return "Oops, seems like something's wrong";
   };
-  return `{${tree.flatMap((node) => parseEntry(node)).join(',')}}`;
+  return `[${tree.flatMap((node) => parseEntry(node)).join(',')}]`;
 };

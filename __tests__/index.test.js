@@ -1,4 +1,9 @@
-import { test, expect } from '@jest/globals';
+import {
+  test,
+  expect,
+  beforeAll,
+  beforeEach,
+} from '@jest/globals';
 import path from 'path';
 import process from 'process';
 import fs from 'fs';
@@ -7,8 +12,8 @@ import genDiff from '../index';
 const getFixturePath = (fileName) => path.join(process.cwd(), '__fixtures__', fileName);
 const readFile = (filename) => fs.readFileSync(getFixturePath(filename), 'utf8');
 
-const getAnswerFromFile = (fileExt, outputFormat) => {
-  const filename = `answer.${outputFormat}.${fileExt}`;
+const getContentFromExpectedFile = (outputFormat) => {
+  const filename = `expected.${outputFormat}`;
   return readFile(filename).trim();
 };
 
@@ -20,73 +25,29 @@ const getResult = (fileExt, outputFormat) => {
   return genDiff(pathToFirstFile, pathToSecondFile, outputFormat);
 };
 
-let result;
-let answer;
-let fileExt;
-let outputFormat;
+let format;
+let expected;
+let formatsStack;
 
-describe('Processing pair of .json files...', () => {
-  fileExt = 'json';
-  test('Testing output in stylish format...', () => {
-    outputFormat = 'stylish';
-    result = getResult(fileExt, outputFormat);
-    answer = getAnswerFromFile(fileExt, outputFormat);
-    expect(result).toBe(answer);
-  });
-  test('Testing output in plain format...', () => {
-    outputFormat = 'plain';
-    result = getResult(fileExt, outputFormat);
-    answer = getAnswerFromFile(fileExt, outputFormat);
-    expect(result).toBe(answer);
-  });
-  test('Testing output in JSON format...', () => {
-    outputFormat = 'json';
-    result = getResult(fileExt, outputFormat);
-    answer = getAnswerFromFile(fileExt, outputFormat);
-    expect(result).toBe(answer);
-  });
+beforeAll(() => {
+  formatsStack = ['json', 'plain', 'stylish'];
 });
-
-describe('Processing pair of .ini files...', () => {
-  fileExt = 'ini';
-  test('Testing output in stylish format...', () => {
-    outputFormat = 'stylish';
-    result = getResult(fileExt, outputFormat);
-    answer = getAnswerFromFile(fileExt, outputFormat);
-    expect(result).toBe(answer);
-  });
-  test('Testing output in plain format...', () => {
-    outputFormat = 'plain';
-    result = getResult(fileExt, outputFormat);
-    answer = getAnswerFromFile(fileExt, outputFormat);
-    expect(result).toBe(answer);
-  });
-  test('Testing output in JSON format...', () => {
-    outputFormat = 'json';
-    result = getResult(fileExt, outputFormat);
-    answer = getAnswerFromFile(fileExt, outputFormat);
-    expect(result).toBe(answer);
-  });
+beforeEach(() => {
+  format = formatsStack.pop();
+  expected = getContentFromExpectedFile(format);
 });
-
-describe('Processing pair of .yml files...', () => {
-  fileExt = 'yml';
-  test('Testing output in stylish format...', () => {
-    outputFormat = 'stylish';
-    result = getResult(fileExt, outputFormat);
-    answer = getAnswerFromFile(fileExt, outputFormat);
-    expect(result).toBe(answer);
-  });
-  test('Testing output in plain format...', () => {
-    outputFormat = 'plain';
-    result = getResult(fileExt, outputFormat);
-    answer = getAnswerFromFile(fileExt, outputFormat);
-    expect(result).toBe(answer);
-  });
-  test('Testing output in JSON format...', () => {
-    outputFormat = 'json';
-    result = getResult(fileExt, outputFormat);
-    answer = getAnswerFromFile(fileExt, outputFormat);
-    expect(result).toBe(answer);
-  });
+test('Comparing 3 types of files in stylish output format...', () => {
+  expect(getResult('json', format)).toBe(expected);
+  expect(getResult('yml', format)).toBe(expected);
+  expect(getResult('ini', format)).toBe(expected);
+});
+test('Comparing 3 types of files in plain output format...', () => {
+  expect(getResult('json', format)).toBe(expected);
+  expect(getResult('yml', format)).toBe(expected);
+  expect(getResult('ini', format)).toBe(expected);
+});
+test('Comparing 3 types of files in JSON output format...', () => {
+  expect(getResult('json', format)).toBe(expected);
+  expect(getResult('yml', format)).toBe(expected);
+  expect(getResult('ini', format)).toBe(expected);
 });
