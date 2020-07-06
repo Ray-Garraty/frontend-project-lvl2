@@ -25,6 +25,7 @@ export default (tree) => {
           return '';
       }
     }
+    // console.log(node.children);
     return node.children.flatMap((child) => parseNode(child, newPath)).filter((element) => element !== '').join('\n').trim();
   };
   return tree.flatMap((node) => parseNode(node, '')).filter((entry) => entry !== '').join('\n').trim();
