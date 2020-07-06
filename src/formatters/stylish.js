@@ -25,7 +25,7 @@ export default (tree) => {
     const keys = Object.keys(entry);
     if (keys.includes('children')) {
       const { children } = entry;
-      return `${createIndentation(n + 1)}${entry.name}: {\n${children.flatMap((child) => parseEntry(child, n + 2)).join('\n')}\n${createIndentation(n)}}`;
+      return `${createIndentation(n + 1)}${entry.name}: {\n${children.flatMap((child) => parseEntry(child, n + 2)).join('\n')}\n${createIndentation(n + 1)}}`;
     }
     return "Oops, seems like something's wrong";
   };
