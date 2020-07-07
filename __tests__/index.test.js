@@ -1,45 +1,30 @@
 import {
   test,
   expect,
-  beforeAll,
-  beforeEach,
+  describe,
 } from '@jest/globals';
 import path from 'path';
+import process from 'process';
 import genDiff from '../index';
 import getFileContents from '../src/parsers.js';
 
-const getResult = (fileExt, outputFormat) => {
-  const getFixturePath = (number) => path.join(process.cwd(), '__fixtures__', `${number}.${fileExt}`);
-  const pathToFirstFile = getFixturePath(1, fileExt);
-  const pathToSecondFile = getFixturePath(2, fileExt);
-  return genDiff(pathToFirstFile, pathToSecondFile, outputFormat);
-};
+const getFixturePath = (filename) => path.join(process.cwd(), '__fixtures__', filename);
 
-let format;
-let expected;
-let formatsStack;
-let expectedFilePath;
-
-beforeAll(() => {
-  formatsStack = ['json', 'plain', 'stylish'];
-});
-beforeEach(() => {
-  format = formatsStack.pop();
-  expectedFilePath = path.join(process.cwd(), '__fixtures__', `expected_${format}`);
-  expected = getFileContents(expectedFilePath);
-});
-test('Comparing 3 types of files in stylish output format...', () => {
-  expect(getResult('json', format)).toBe(expected);
-  expect(getResult('yml', format)).toBe(expected);
-  expect(getResult('ini', format)).toBe(expected);
-});
-test('Comparing 3 types of files in plain output format...', () => {
-  expect(getResult('json', format)).toBe(expected);
-  expect(getResult('yml', format)).toBe(expected);
-  expect(getResult('ini', format)).toBe(expected);
-});
-test('Comparing 3 types of files in JSON output format...', () => {
-  expect(getResult('json', format)).toBe(expected);
-  expect(getResult('yml', format)).toBe(expected);
-  expect(getResult('ini', format)).toBe(expected);
+describe('Running tests...', () => {
+  const json = getFileContents(getFixturePath('expected_json'));
+  const plain = getFileContents(getFixturePath('expected_plain'));
+  const stylish = getFileContents(getFixturePath('expected_stylish'));
+  const extensions = ['json', 'yml', 'ini'];
+  const formatsAndExpectedFiles = { stylish, plain, json };
+  const array = Object.entries(formatsAndExpectedFiles);
+  const testTable = extensions.flatMap((ext) => array.map((item) => {
+    const sourceFilesPaths = [getFixturePath(`1.${ext}`), getFixturePath(`2.${ext}`)];
+    return [sourceFilesPaths, ...item];
+  }));
+  // пытался сделать testTable как положено в виде переменной, объявив её на уровне модуля,
+  // но это не сработало, блок test.each её не видел,
+  // поэтому пришлось её сделать константой внутри блока describe
+  test.each(testTable)('Testing genDiff function...', ([filepath1, filepath2], format, expectedFileContent) => {
+    expect(genDiff(filepath1, filepath2, format)).toBe(expectedFileContent);
+  });
 });
