@@ -1,35 +1,39 @@
-import fs from 'fs';
 import ini from 'ini';
-import path from 'path';
+import _ from 'lodash';
 import yaml from 'js-yaml';
 
-const getFileContents = (somepath) => {
-  const makeFullFilePath = (randomPath) => {
-    if (randomPath.startsWith('/')) {
-      return randomPath;
-    }
-    if (randomPath.startsWith('~')) {
-      return path.join(process.env.home, randomPath);
-    }
-    return path.join(process.cwd(), randomPath);
-  };
-  const parseFile = (filePath) => {
-    const fileContents = fs.readFileSync(filePath, 'utf-8');
-    const fileName = path.basename(filePath);
-    const extension = path.extname(fileName);
-    switch (extension) {
-      case '.yml':
-        return yaml.safeLoad(fileContents);
-      case '.ini':
-        return ini.parse(fileContents);
-      case '.json':
-        return JSON.parse(fileContents);
-      default:
-        return fileContents.trim();
-    }
-  };
-  const fullFilePath = makeFullFilePath(somepath);
-  return parseFile(fullFilePath);
+const parseFile = (fileContents, fileExtension) => {
+  switch (fileExtension) {
+    case '.yml':
+      return yaml.safeLoad(fileContents);
+    case '.ini':
+      return ini.parse(fileContents);
+    case '.json':
+      return JSON.parse(fileContents);
+    case '':
+      return fileContents.trim();
+    default:
+      throw new Error(`Unknown input file extension: ${fileExtension}`);
+  }
 };
 
-export default getFileContents;
+const parseValue = (value) => {
+  if (_.isBoolean(value)) {
+    return value;
+  }
+  if (!Number.isNaN(Number(value))) {
+    return Number(value);
+  }
+  if (_.isPlainObject(value)) {
+    const entries = Object.entries(value);
+    const f = (acc, entry) => {
+      const [key, val] = entry;
+      acc[key] = parseValue(val);
+      return acc;
+    };
+    return entries.reduce(f, {});
+  }
+  return value;
+};
+
+export { parseFile, parseValue };
