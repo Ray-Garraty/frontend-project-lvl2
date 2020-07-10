@@ -1,17 +1,17 @@
-import { parseFile } from './src/parsers.js';
-import compareTwoObjects from './src/comparator.js';
+import parseFile from './src/parsers.js';
+import buildTree from './src/treebuilder.js';
 import chooseFormatter from './src/formatters/index.js';
-import { makeFullFilePath, getFileExtension, getFileContents } from './src/utilities.js';
+import { getFilePath, getFileFormat, getFileContents } from './src/fstoolkit.js';
 
 const genDiff = (filepath1, filepath2, format) => {
-  const fileContents1 = getFileContents(makeFullFilePath(filepath1));
-  const fileContents2 = getFileContents(makeFullFilePath(filepath2));
-  const fileExt1 = getFileExtension(filepath1);
-  const fileExt2 = getFileExtension(filepath2);
-  const obj1 = parseFile(fileContents1, fileExt1);
-  const obj2 = parseFile(fileContents2, fileExt2);
-  const tree = compareTwoObjects(obj1, obj2);
-  return chooseFormatter(format)(tree);
+  const fileContents1 = getFileContents(getFilePath(filepath1));
+  const fileContents2 = getFileContents(getFilePath(filepath2));
+  const format1 = getFileFormat(filepath1);
+  const format2 = getFileFormat(filepath2);
+  const obj1 = parseFile(fileContents1, format1);
+  const obj2 = parseFile(fileContents2, format2);
+  const tree = buildTree(obj1, obj2);
+  return chooseFormatter(tree, format);
 };
 
 export default genDiff;

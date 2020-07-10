@@ -2,38 +2,40 @@ import ini from 'ini';
 import _ from 'lodash';
 import yaml from 'js-yaml';
 
-const parseFile = (fileContents, fileExtension) => {
-  switch (fileExtension) {
-    case '.yml':
-      return yaml.safeLoad(fileContents);
-    case '.ini':
-      return ini.parse(fileContents);
-    case '.json':
-      return JSON.parse(fileContents);
-    case '':
-      return fileContents.trim();
-    default:
-      throw new Error(`Unknown input file extension: ${fileExtension}`);
-  }
-};
-
-const parseValue = (value) => {
-  if (_.isBoolean(value)) {
-    return value;
-  }
-  if (!Number.isNaN(Number(value))) {
-    return Number(value);
-  }
-  if (_.isPlainObject(value)) {
-    const entries = Object.entries(value);
-    const f = (acc, entry) => {
-      const [key, val] = entry;
-      acc[key] = parseValue(val);
+const parseIni = (fileContents) => {
+  const parsedFileContents = ini.parse(fileContents);
+  const parseValuesInObject = (object) => {
+    const array = Object.entries(object);
+    const f = (acc, [key, value]) => {
+      if (_.isBoolean(value)) {
+        acc[key] = value;
+        return acc;
+      }
+      if (!Number.isNaN(Number(value))) {
+        acc[key] = Number(value);
+        return acc;
+      }
+      if (_.isPlainObject(value)) {
+        acc[key] = parseValuesInObject(value);
+        return acc;
+      }
+      acc[key] = value;
       return acc;
     };
-    return entries.reduce(f, {});
-  }
-  return value;
+    return array.reduce(f, {});
+  };
+  return parseValuesInObject(parsedFileContents);
 };
 
-export { parseFile, parseValue };
+export default (fileContents, format) => {
+  switch (format) {
+    case 'yml':
+      return yaml.safeLoad(fileContents);
+    case 'ini':
+      return parseIni(fileContents);
+    case 'json':
+      return JSON.parse(fileContents);
+    default:
+      throw new Error(`Unknown input file format: ${format}`);
+  }
+};
