@@ -3,28 +3,13 @@ import _ from 'lodash';
 import yaml from 'js-yaml';
 
 const parseIni = (fileContents) => {
-  const parsedFileContents = ini.parse(fileContents);
-  const parseValuesInObject = (object) => {
-    const array = Object.entries(object);
-    const f = (acc, [key, value]) => {
-      if (_.isBoolean(value)) {
-        acc[key] = value;
-        return acc;
-      }
-      if (!Number.isNaN(Number(value))) {
-        acc[key] = Number(value);
-        return acc;
-      }
-      if (_.isPlainObject(value)) {
-        acc[key] = parseValuesInObject(value);
-        return acc;
-      }
-      acc[key] = value;
-      return acc;
-    };
-    return array.reduce(f, {});
-  };
-  return parseValuesInObject(parsedFileContents);
+  const normalizeValue = (value) => (
+    _.isBoolean(value) || Number.isNaN(Number(value)) ? value : Number(value)
+  );
+  const parseObject = (object) => _.mapValues(object, (value) => (
+    _.isPlainObject(value) ? parseObject(value) : normalizeValue(value)
+  ));
+  return parseObject(ini.parse(fileContents));
 };
 
 export default (fileContents, format) => {
