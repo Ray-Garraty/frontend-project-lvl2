@@ -1,11 +1,12 @@
+import path from 'path';
 import parseFile from './src/parsers.js';
 import buildTree from './src/treebuilder.js';
 import chooseFormatter from './src/formatters/index.js';
-import { getFilePath, getFileFormat, getFileContents } from './src/fstoolkit.js';
+import { getFileFormat, getFileContents } from './src/fstoolkit.js';
 
 const genDiff = (filepath1, filepath2, format) => {
-  const fileContents1 = getFileContents(getFilePath(filepath1));
-  const fileContents2 = getFileContents(getFilePath(filepath2));
+  const fileContents1 = getFileContents(path.resolve(filepath1));
+  const fileContents2 = getFileContents(path.resolve(filepath2));
   const format1 = getFileFormat(filepath1);
   const format2 = getFileFormat(filepath2);
   const obj1 = parseFile(fileContents1, format1);

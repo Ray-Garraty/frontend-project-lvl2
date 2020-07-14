@@ -18,10 +18,15 @@ const parseEntry = (entry, n) => {
       return `${createIndentation(n)}- ${entry.name}: ${parseValue(entry.value, n)}`;
     case 'same':
       return `${createIndentation(n)}  ${entry.name}: ${parseValue(entry.value, n)}`;
-    case 'differs':
-      return `${createIndentation(n)}- ${entry.name}: ${parseValue(entry.value1, n)}\n${createIndentation(n)}+ ${entry.name}: ${parseValue(entry.value2, n)}`;
-    case 'parent':
-      return `${createIndentation(n + 1)}${entry.name}: {\n${entry.children.flatMap((child) => parseEntry(child, n + 2)).join('\n')}\n${createIndentation(n + 1)}}`;
+    case 'differs': {
+      const indent = createIndentation(n);
+      return `${indent}- ${entry.name}: ${parseValue(entry.value1, n)}\n${indent}+ ${entry.name}: ${parseValue(entry.value2, n)}`;
+    }
+    case 'parent': {
+      const incrIndt = createIndentation(n + 1);
+      const parsedChildren = entry.children.flatMap((child) => parseEntry(child, n + 2)).join('\n');
+      return `${incrIndt}${entry.name}: {\n${parsedChildren}\n${incrIndt}}`;
+    }
     default:
       throw new Error(`Unknown node type: ${entry.type}`);
   }

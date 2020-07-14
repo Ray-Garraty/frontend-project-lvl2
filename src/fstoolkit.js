@@ -6,14 +6,6 @@ import path, { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const getFilePath = (somepath) => path.resolve(somepath);
-const getFileFormat = (filepath) => path.extname(filepath).slice(1);
-const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
-const getFileContents = (fullFilePath) => fs.readFileSync(fullFilePath, 'utf-8').trim();
-
-export {
-  getFilePath,
-  getFileFormat,
-  getFixturePath,
-  getFileContents,
-};
+export const getFileFormat = (filepath) => path.extname(filepath).slice(1);
+export const buildFilePath = (...paths) => path.resolve(__dirname, ...paths);
+export const getFileContents = (fullFilePath) => fs.readFileSync(fullFilePath, 'utf-8').trim();
