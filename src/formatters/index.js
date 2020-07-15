@@ -1,16 +1,16 @@
-import makePlainOutput from './plain.js';
-import makeJsonLikeOutput from './json.js';
-import makeStylishOutput from './stylish.js';
+import doPlain from './plain.js';
+import doJson from './json.js';
+import doStylish from './stylish.js';
 
 export default (tree, format) => {
   switch (format) {
     case 'plain':
-      return makePlainOutput(tree);
+      return doPlain(tree);
     case 'json':
-      return makeJsonLikeOutput(tree);
+      return doJson(tree);
     case 'stylish':
-      return makeStylishOutput(tree);
+      return doStylish(tree);
     default:
-      throw new Error(`Unknown output format: ${format}`);
+      throw new Error(`Unknown format: ${format}`);
   }
 };

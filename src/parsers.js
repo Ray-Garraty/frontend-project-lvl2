@@ -2,25 +2,22 @@ import ini from 'ini';
 import _ from 'lodash';
 import yaml from 'js-yaml';
 
-const parseIni = (fileContents) => {
-  const normalizeValue = (value) => (
-    _.isBoolean(value) || Number.isNaN(Number(value)) ? value : Number(value)
-  );
-  const parseObject = (object) => _.mapValues(object, (value) => (
-    _.isPlainObject(value) ? parseObject(value) : normalizeValue(value)
-  ));
-  return parseObject(ini.parse(fileContents));
-};
+const normalizeStringNumbers = (object) => _.mapValues(object, (value) => {
+  if (!_.isPlainObject(value)) {
+    return parseFloat(value) || value;
+  }
+  return normalizeStringNumbers(value);
+});
 
-export default (fileContents, format) => {
+export default (data, format) => {
   switch (format) {
     case 'yml':
-      return yaml.safeLoad(fileContents);
+      return yaml.safeLoad(data);
     case 'ini':
-      return parseIni(fileContents);
+      return normalizeStringNumbers(ini.parse(data));
     case 'json':
-      return JSON.parse(fileContents);
+      return JSON.parse(data);
     default:
-      throw new Error(`Unknown input file format: ${format}`);
+      throw new Error(`Unknown data format: ${format}`);
   }
 };

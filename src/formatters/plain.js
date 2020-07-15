@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const parseValue = (value) => {
+const stringifyValue = (value) => {
   if (_.isPlainObject(value)) {
     return '[complex value]';
   }
@@ -11,24 +11,25 @@ const parseValue = (value) => {
 };
 
 const parseNode = (someNode) => {
-  const iter = (node, path) => {
-    const newPath = path === '' ? node.name : `${path}.${node.name}`;
+  const iter = (node, ancestry) => {
+    const updatedAncestry = ancestry === '' ? node.name : `${ancestry}.${node.name}`;
     switch (node.type) {
       case 'added':
-        return `Property '${newPath}' was added with value: ${parseValue(node.value)}`;
+        return `Property '${updatedAncestry}' was added with value: ${stringifyValue(node.value)}`;
       case 'removed':
-        return `Property '${newPath}' was removed`;
+        return `Property '${updatedAncestry}' was removed`;
       case 'differs':
-        return `Property '${newPath}' was updated. From ${parseValue(node.value1)} to ${parseValue(node.value2)}`;
+        return `Property '${updatedAncestry}' was updated. From ${stringifyValue(node.value1)} to ${stringifyValue(node.value2)}`;
       case 'parent':
-        return node.children.flatMap((child) => iter(child, newPath)).filter((element) => element !== '').join('\n').trim();
+        return node.children.flatMap((child) => iter(child, updatedAncestry));
       case 'same':
-        return '';
+        return null;
       default:
         throw new Error(`Unknown node type: ${node.type}`);
     }
   };
-  return iter(someNode, '');
+  const result = iter(someNode, '');
+  return Array.isArray(result) ? result.filter(_.identity) : result;
 };
 
-export default (tree) => tree.flatMap((node) => parseNode(node)).filter((entry) => entry !== '').join('\n').trim();
+export default (tree) => tree.flatMap((node) => parseNode(node)).join('\n').trim();

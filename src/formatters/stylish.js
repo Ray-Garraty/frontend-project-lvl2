@@ -24,8 +24,8 @@ const parseEntry = (entry, n) => {
     }
     case 'parent': {
       const incrIndt = createIndentation(n + 1);
-      const parsedChildren = entry.children.flatMap((child) => parseEntry(child, n + 2)).join('\n');
-      return `${incrIndt}${entry.name}: {\n${parsedChildren}\n${incrIndt}}`;
+      const parsedChildren = entry.children.flatMap((child) => parseEntry(child, n + 2));
+      return `${incrIndt}${entry.name}: {\n${parsedChildren.join('\n')}\n${incrIndt}}`;
     }
     default:
       throw new Error(`Unknown node type: ${entry.type}`);
