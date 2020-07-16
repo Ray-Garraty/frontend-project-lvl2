@@ -1,35 +1,42 @@
 import _ from 'lodash';
 
-const createIndentation = (n) => '  '.repeat(n);
+const createIndent = (n) => '  '.repeat(n);
 
-const parseValue = (value, n) => {
+const formatValue = (value, n) => {
   if (!_.isPlainObject(value)) {
     return value;
   }
   const [[key, val]] = Object.entries(value);
-  return `{\n${createIndentation(n + 3)}${key}: ${val}\n${createIndentation(n + 1)}}`;
+  return `{\n${createIndent(n + 3)}${key}: ${val}\n${createIndent(n + 1)}}`;
 };
 
-const parseEntry = (entry, n) => {
-  switch (entry.type) {
-    case 'added':
-      return `${createIndentation(n)}+ ${entry.name}: ${parseValue(entry.value, n)}`;
-    case 'removed':
-      return `${createIndentation(n)}- ${entry.name}: ${parseValue(entry.value, n)}`;
-    case 'same':
-      return `${createIndentation(n)}  ${entry.name}: ${parseValue(entry.value, n)}`;
-    case 'differs': {
-      const indent = createIndentation(n);
-      return `${indent}- ${entry.name}: ${parseValue(entry.value1, n)}\n${indent}+ ${entry.name}: ${parseValue(entry.value2, n)}`;
+export default (data) => {
+  const iter = (tree, acc) => tree.flatMap((node) => {
+    const {
+      name,
+      type,
+      value,
+      value1,
+      value2,
+      children,
+    } = node;
+    switch (type) {
+      case 'added':
+        return `${createIndent(acc)}+ ${name}: ${formatValue(value, acc)}`;
+      case 'removed':
+        return `${createIndent(acc)}- ${name}: ${formatValue(value, acc)}`;
+      case 'same':
+        return `${createIndent(acc)}  ${name}: ${formatValue(value, acc)}`;
+      case 'differs': {
+        const indent = createIndent(acc);
+        return `${indent}- ${name}: ${formatValue(value1, acc)}\n${indent}+ ${node.name}: ${formatValue(value2, acc)}`;
+      }
+      case 'parent': {
+        return `${createIndent(acc + 1)}${node.name}: {\n${iter(children, acc + 2).join('\n')}\n${createIndent(acc + 1)}}`;
+      }
+      default:
+        throw new Error(`Unknown node type: ${node.type}`);
     }
-    case 'parent': {
-      const incrIndt = createIndentation(n + 1);
-      const parsedChildren = entry.children.flatMap((child) => parseEntry(child, n + 2));
-      return `${incrIndt}${entry.name}: {\n${parsedChildren.join('\n')}\n${incrIndt}}`;
-    }
-    default:
-      throw new Error(`Unknown node type: ${entry.type}`);
-  }
+  });
+  return `{\n${iter(data, 1).join('\n')}\n}`;
 };
-
-export default (tree) => `{\n${tree.flatMap((node) => parseEntry(node, 1)).join('\n')}\n}`;

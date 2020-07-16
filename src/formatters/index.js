@@ -1,15 +1,15 @@
-import doPlain from './plain.js';
-import doJson from './json.js';
-import doStylish from './stylish.js';
+import renderJson from './json.js';
+import renderPlain from './plain.js';
+import renderStylish from './stylish.js';
 
 export default (tree, format) => {
   switch (format) {
     case 'plain':
-      return doPlain(tree);
+      return renderPlain(tree);
     case 'json':
-      return doJson(tree);
+      return renderJson(tree);
     case 'stylish':
-      return doStylish(tree);
+      return renderStylish(tree);
     default:
       throw new Error(`Unknown format: ${format}`);
   }
