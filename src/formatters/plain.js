@@ -11,17 +11,17 @@ const formatValue = (value) => {
 };
 
 export default (data) => {
-  const iter = (tree, acc) => tree.flatMap((node) => {
-    const newAcc = acc === '' ? node.name : `${acc}.${node.name}`;
+  const iter = (tree, parentName) => tree.flatMap((node) => {
+    const fullName = parentName === '' ? node.name : `${parentName}.${node.name}`;
     switch (node.type) {
       case 'added':
-        return `Property '${newAcc}' was added with value: ${formatValue(node.value)}`;
+        return `Property '${fullName}' was added with value: ${formatValue(node.value)}`;
       case 'removed':
-        return `Property '${newAcc}' was removed`;
+        return `Property '${fullName}' was removed`;
       case 'differs':
-        return `Property '${newAcc}' was updated. From ${formatValue(node.value1)} to ${formatValue(node.value2)}`;
+        return `Property '${fullName}' was updated. From ${formatValue(node.value1)} to ${formatValue(node.value2)}`;
       case 'parent':
-        return iter(node.children, newAcc);
+        return iter(node.children, fullName);
       case 'same':
         return null;
       default:
