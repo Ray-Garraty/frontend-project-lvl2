@@ -10,13 +10,11 @@ const buildTree = (object1, object2) => {
     const value2 = object2[key];
     if (!_.has(object1, key)) {
       const type = 'added';
-      const value = value2;
-      return { name, type, value };
+      return { name, type, value: value2 };
     }
     if (!_.has(object2, key)) {
       const type = 'removed';
-      const value = value1;
-      return { name, type, value };
+      return { name, type, value: value1 };
     }
     if (_.isPlainObject(value1) && _.isPlainObject(value2)) {
       const children = buildTree(value1, value2);
@@ -25,8 +23,7 @@ const buildTree = (object1, object2) => {
     }
     if (value1 === value2) {
       const type = 'same';
-      const value = value1;
-      return { name, type, value };
+      return { name, type, value: value1 };
     }
     const type = 'differs';
     return {
