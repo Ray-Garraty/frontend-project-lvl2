@@ -1,45 +1,44 @@
 import _ from 'lodash';
 
 const offset = 2;
-const separator = '  ';
-const openSymbol = '{';
-const closingSymbol = '}';
-const lineBreakSymbol = '\n';
 const keyMarkers = {
-  same: '',
-  parent: '',
-  added: '+',
-  removed: '-',
+  same: '  ',
+  parent: '  ',
+  added: '+ ',
+  removed: '- ',
 };
 
 const createIndent = (n) => '  '.repeat(n);
 
-const createPrefix = (name, type, depth) => {
+const createPrefixOrPostfix = (symbol, depth, name, type = 'same') => {
+/* Меня сбило с толку слово "префикс", в моём семантическом понимании оно относится
+только к тому, что расположено в начале собираемой строки.
+Всё, что будет находиться в конце собираемой строки, логичнее назвать "окончание" или "постфикс". */
   const indent = createIndent(depth);
-  const marker = keyMarkers[type].padEnd(2, ' ');
-  return `${indent}${marker}${name}`;
-};
-
-const createEnding = (depth) => {
-  const indent = createIndent(depth);
-  return [indent, closingSymbol].join(separator);
-};
-
-const formatValue = ([key, value], depth) => {
-  const indent = createIndent(depth);
-  if (!_.isPlainObject(value)) {
-    return key === null
-      ? value
-      : [indent, `${key}: ${value}`].join(separator);
+  const marker = keyMarkers[type];
+  switch (symbol) {
+    case '{':
+      return type === 'parent'
+        ? `${indent}${marker}${name}: {`
+        : `${indent}${marker}${name}: `;
+    case '}':
+      return `${indent}${marker}}`;
+    default:
+      throw new Error(`Unexpected symbol: ${symbol}`);
   }
-  const ending = createEnding(depth);
-  const [entry] = Object.entries(value);
-  return [
-    openSymbol,
-    formatValue(entry, depth + offset),
-    ending,
-  ].join(lineBreakSymbol); // здесь без join() никак, потому что как я потом
-  // в самом конце залезу внутрь значений, чтобы их склеить, да и нужно ли это?
+};
+
+const formatValue = (data, depth) => {
+  if (!_.isPlainObject(data)) {
+    return data;
+  }
+  const postfix = createPrefixOrPostfix('}', depth);
+  const lines = [
+    '{',
+    ...(_.entries(data)).map(([key, value]) => `${createPrefixOrPostfix('{', depth + offset, key)}${value}`),
+    postfix,
+  ];
+  return lines.join('\n');
 };
 
 export default (data) => {
@@ -52,21 +51,21 @@ export default (data) => {
       value2,
       children,
     } = node;
-    const ending = createEnding(depth);
+    const ending = createPrefixOrPostfix('}', depth);
     switch (type) {
       case 'added':
       case 'removed':
       case 'same': {
-        return `${createPrefix(name, type, depth)}: ${formatValue([null, value], depth)}`;
+        return `${createPrefixOrPostfix('{', depth, name, type)}${formatValue(value, depth)}`;
       }
       case 'differs': {
-        const firstEntry = `${createPrefix(name, 'removed', depth)}: ${formatValue([null, value1], depth)}`;
-        const secondEntry = `${createPrefix(name, 'added', depth)}: ${formatValue([null, value2], depth)}`;
+        const firstEntry = `${createPrefixOrPostfix('{', depth, name, 'removed')}${formatValue(value1, depth)}`;
+        const secondEntry = `${createPrefixOrPostfix('{', depth, name, 'added')}${formatValue(value2, depth)}`;
         return [firstEntry, secondEntry];
       }
       case 'parent':
         return [
-          `${createPrefix(name, type, depth)}: ${openSymbol}`,
+          `${createPrefixOrPostfix('{', depth, name, type)}`,
           ...iter(children, depth + offset),
           ending,
         ];
@@ -74,5 +73,5 @@ export default (data) => {
         throw new Error(`Unexpected node type: ${type}`);
     }
   });
-  return [openSymbol, iter(data, 1).join(lineBreakSymbol), closingSymbol].join(lineBreakSymbol);
+  return ['{', ...iter(data, 1), '}'].join('\n');
 };
