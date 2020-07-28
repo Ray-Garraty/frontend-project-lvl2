@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const formatValue = (value) => {
+const stringifyValue = (value) => {
   if (_.isPlainObject(value)) {
     return '[complex value]';
   }
@@ -12,17 +12,17 @@ const formatValue = (value) => {
 
 export default (data) => {
   const iter = (tree, parentName) => tree.flatMap((node) => {
-    const fullName = parentName === '' ? node.name : `${parentName}.${node.name}`;
+    const fullName = parentName === '' ? node.key : `${parentName}.${node.key}`;
     switch (node.type) {
       case 'added':
-        return `Property '${fullName}' was added with value: ${formatValue(node.value)}`;
+        return `Property '${fullName}' was added with value: ${stringifyValue(node.value)}`;
       case 'removed':
         return `Property '${fullName}' was removed`;
-      case 'differs':
-        return `Property '${fullName}' was updated. From ${formatValue(node.value1)} to ${formatValue(node.value2)}`;
-      case 'parent':
+      case 'unequal':
+        return `Property '${fullName}' was updated. From ${stringifyValue(node.value1)} to ${stringifyValue(node.value2)}`;
+      case 'nested':
         return iter(node.children, fullName);
-      case 'same':
+      case 'equal':
         return null;
       default:
         throw new Error(`Unknown node type: ${node.type}`);

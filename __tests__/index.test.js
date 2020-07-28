@@ -4,7 +4,7 @@ import {
   beforeAll,
 } from '@jest/globals';
 import genDiff from '../index';
-import { buildFullPath, readData } from '../src/fstoolkit.js';
+import { buildFullPath, readFile } from '../src/fstoolkit.js';
 
 const extensions = ['json', 'yml', 'ini'];
 const formats = ['stylish', 'plain', 'json'];
@@ -14,11 +14,21 @@ const buildFixturePath = (filename) => buildFullPath('..', '__fixtures__', filen
 
 beforeAll(() => {
   formats.forEach((format) => {
-    expected[format] = readData(buildFixturePath(`expected_${format}`)).trim();
+    const filepath = buildFixturePath(`expected_${format}`);
+    expected[format] = readFile(filepath).trim();
   });
 });
 
-test.each(testTable)('Testing genDiff function...', (ext, format) => {
-  const result = genDiff(buildFixturePath(`1.${ext}`), buildFixturePath(`2.${ext}`), format);
+test.each(testTable)('Testing genDiff function when format is specified...', (ext, format) => {
+  const filepath1 = buildFixturePath(`1.${ext}`);
+  const filepath2 = buildFixturePath(`2.${ext}`);
+  const result = genDiff(filepath1, filepath2, format);
   expect(result).toBe(expected[format]);
+});
+
+test.each(extensions)('Testing genDiff function when format is not specified...', (ext) => {
+  const filepath1 = buildFixturePath(`1.${ext}`);
+  const filepath2 = buildFixturePath(`2.${ext}`);
+  const result = genDiff(filepath1, filepath2);
+  expect(result).toBe(expected.stylish);
 });

@@ -4,7 +4,7 @@
 a compact cli tool for quick and demonstrative files comparison
 ___
 ### About  
-**__gendiff__** compares content of the two (nested) files of the following formats:
+**__gendiff__** compares content of the two (nested) files of the following extensions:
 * .json
 * .yml
 * .ini  
@@ -16,7 +16,10 @@ ___
 ___
 ### Installation
 ```  
-npm install gendiff  
+git clone https://github.com/Ray-Garraty/frontend-project-lvl2.git
+make install
+make publish
+npm link  
 ```
 ___
 ### Usage
