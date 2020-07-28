@@ -1,42 +1,25 @@
 import _ from 'lodash';
 
 const offset = 2;
+const openSymbol = '{';
+const closeSymbol = '}';
 const keyMarkers = {
-  same: '  ',
-  parent: '  ',
-  added: '+ ',
-  removed: '- ',
+  added: '+',
+  removed: '-',
 };
 
 const createIndent = (n) => '  '.repeat(n);
 
-const createPrefixOrPostfix = (symbol, depth, name, type = 'same') => {
-/* Меня сбило с толку слово "префикс", в моём семантическом понимании оно относится
-только к тому, что расположено в начале собираемой строки.
-Всё, что будет находиться в конце собираемой строки, логичнее назвать "окончание" или "постфикс". */
-  const indent = createIndent(depth);
-  const marker = keyMarkers[type];
-  switch (symbol) {
-    case '{':
-      return type === 'parent'
-        ? `${indent}${marker}${name}: {`
-        : `${indent}${marker}${name}: `;
-    case '}':
-      return `${indent}${marker}}`;
-    default:
-      throw new Error(`Unexpected symbol: ${symbol}`);
-  }
-};
+const addPrefix = (symbol, depth, marker = ' ') => `${createIndent(depth)}${marker} ${symbol}`;
 
-const formatValue = (data, depth) => {
+const formatValue = (data, initIndent) => {
   if (!_.isPlainObject(data)) {
     return data;
   }
-  const postfix = createPrefixOrPostfix('}', depth);
   const lines = [
-    '{',
-    ...(_.entries(data)).map(([key, value]) => `${createPrefixOrPostfix('{', depth + offset, key)}${value}`),
-    postfix,
+    openSymbol,
+    ...(Object.entries(data)).map(([key, value]) => `${addPrefix(key, initIndent + offset)}: ${formatValue(value, initIndent + offset)}`),
+    addPrefix(closeSymbol, initIndent),
   ];
   return lines.join('\n');
 };
@@ -51,27 +34,26 @@ export default (data) => {
       value2,
       children,
     } = node;
-    const ending = createPrefixOrPostfix('}', depth);
     switch (type) {
       case 'added':
       case 'removed':
       case 'same': {
-        return `${createPrefixOrPostfix('{', depth, name, type)}${formatValue(value, depth)}`;
+        return `${addPrefix(name, depth, keyMarkers[type])}: ${formatValue(value, depth)}`;
       }
       case 'differs': {
-        const firstEntry = `${createPrefixOrPostfix('{', depth, name, 'removed')}${formatValue(value1, depth)}`;
-        const secondEntry = `${createPrefixOrPostfix('{', depth, name, 'added')}${formatValue(value2, depth)}`;
+        const firstEntry = `${addPrefix(name, depth, '-')}: ${formatValue(value1, depth)}`;
+        const secondEntry = `${addPrefix(name, depth, '+')}: ${formatValue(value2, depth)}`;
         return [firstEntry, secondEntry];
       }
       case 'parent':
         return [
-          `${createPrefixOrPostfix('{', depth, name, type)}`,
+          `${addPrefix(name, depth)}: ${openSymbol}`,
           ...iter(children, depth + offset),
-          ending,
+          addPrefix(closeSymbol, depth),
         ];
       default:
         throw new Error(`Unexpected node type: ${type}`);
     }
   });
-  return ['{', ...iter(data, 1), '}'].join('\n');
+  return [openSymbol, ...iter(data, 1), closeSymbol].join('\n');
 };
