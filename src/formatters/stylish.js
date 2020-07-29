@@ -3,28 +3,27 @@ import _ from 'lodash';
 const offset = 2;
 const openSymbol = '{';
 const closeSymbol = '}';
+const indentSymbol = '  ';
 const keyMarkers = {
   added: '+',
   removed: '-',
   equal: ' ',
-  nested: '  ',
 };
 
 const createIndent = (n) => '  '.repeat(n);
 
 const addPrefix = (symbol, indent, marker = ' ') => `${indent}${marker} ${symbol}`;
 
-const stringifyValue = (data, indent) => {
+const stringify = (data, indent) => {
   if (!_.isPlainObject(data)) {
     return data;
   }
-  const currentIndent = createIndent(indent);
-  const nestedIndent = createIndent(indent + offset);
+  const nestedIndent = addPrefix(indentSymbol, indent);
   const lines = [
     openSymbol,
-    ...(_.entries(data))
-      .map(([key, value]) => `${addPrefix(key, nestedIndent)}: ${stringifyValue(value, indent + offset)}`),
-    addPrefix(closeSymbol, currentIndent),
+    ...(_.entries(data)
+      .map(([key, value]) => `${addPrefix(key, nestedIndent)}: ${stringify(value, nestedIndent)}`)),
+    addPrefix(closeSymbol, indent),
   ];
   return lines.join('\n');
 };
@@ -43,14 +42,13 @@ export default (data) => {
     switch (type) {
       case 'added':
       case 'removed':
-      case 'equal': {
-        return `${addPrefix(key, indent, keyMarkers[type])}: ${stringifyValue(value, depth)}`;
-      }
-      case 'unequal': {
-        const firstEntry = `${addPrefix(key, indent, keyMarkers.removed)}: ${stringifyValue(value1, depth)}`;
-        const secondEntry = `${addPrefix(key, indent, keyMarkers.added)}: ${stringifyValue(value2, depth)}`;
-        return [firstEntry, secondEntry];
-      }
+      case 'unchanged':
+        return `${addPrefix(key, indent, keyMarkers[type])}: ${stringify(value, indent)}`;
+      case 'changed':
+        return [
+          `${addPrefix(key, indent, keyMarkers.removed)}: ${stringify(value1, indent)}`,
+          `${addPrefix(key, indent, keyMarkers.added)}: ${stringify(value2, indent)}`,
+        ];
       case 'nested':
         return [
           `${addPrefix(key, indent)}: ${openSymbol}`,

@@ -18,11 +18,11 @@ export default (data) => {
         return `Property '${fullName}' was added with value: ${stringifyValue(node.value)}`;
       case 'removed':
         return `Property '${fullName}' was removed`;
-      case 'unequal':
+      case 'changed':
         return `Property '${fullName}' was updated. From ${stringifyValue(node.value1)} to ${stringifyValue(node.value2)}`;
       case 'nested':
         return iter(node.children, fullName);
-      case 'equal':
+      case 'unchanged':
         return null;
       default:
         throw new Error(`Unknown node type: ${node.type}`);

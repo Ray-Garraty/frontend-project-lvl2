@@ -15,11 +15,10 @@ ___
 * "_json_": json-like string
 ___
 ### Installation
-```  
-git clone https://github.com/Ray-Garraty/frontend-project-lvl2.git
+Clone this repo
+```
 make install
-make publish
-npm link  
+make link  
 ```
 ___
 ### Usage
